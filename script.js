@@ -49,7 +49,7 @@ if (canvas) {
     // Preload frames
     for (let i = 0; i < frameCount; i++) {
         const img = new Image();
-        img.src = `./Hero shoot/frame_${String(i).padStart(3, '0')}_delay-0.033s.jpg`;
+        img.src = `./Hero/frame_${String(i).padStart(3, '0')}_delay-0.033s.jpg`;
         img.onload = () => {
             framesLoaded++;
             if (loadingBar) {
