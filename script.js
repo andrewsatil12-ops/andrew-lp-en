@@ -57,13 +57,18 @@ if (canvas) {
             }
             // Draw first frame immediately when it loads
             if (i === 0) {
-                drawImageCover(ctx, img, canvas.width, canvas.height);
+                drawFrame(0);
             }
             if (framesLoaded === frameCount && loadingBar) {
                 setTimeout(() => { loadingBar.style.opacity = '0'; }, 500);
             }
         };
         frames.push(img);
+    }
+    
+    // Safely draw if already complete from cache
+    if (frames[0].complete) {
+        drawFrame(0);
     }
 
     function drawImageCover(ctx, img, canvasW, canvasH) {
@@ -96,7 +101,7 @@ if (canvas) {
 
     function drawFrame(index) {
         const img = frames[index];
-        if (img && img.complete) {
+        if (img && img.complete && img.naturalWidth > 0) {
             drawImageCover(ctx, img, canvas.width, canvas.height);
         }
     }
