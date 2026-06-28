@@ -1,6 +1,29 @@
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
+// Hero entrance animation
+window.addEventListener('load', () => {
+    const heroH1 = document.querySelector('.hero-content h1');
+    const heroSub = document.querySelector('.hero-subtitle');
+    const heroCta = document.getElementById('hero-cta');
+
+    if (heroH1) {
+        gsap.fromTo(heroH1,
+            { opacity: 0, y: 24 },
+            { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: 0.2 }
+        );
+    }
+    if (heroSub) {
+        gsap.fromTo(heroSub,
+            { opacity: 0, y: 16 },
+            { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: 0.45 }
+        );
+    }
+    if (heroCta) {
+        setTimeout(() => heroCta.classList.add('is-visible'), 100);
+    }
+});
+
 // Respect prefers-reduced-motion
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
