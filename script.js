@@ -5,30 +5,28 @@ gsap.registerPlugin(ScrollTrigger);
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Mobile Menu Toggle
-const menuToggle = document.querySelector('.menu-toggle');
-const mobileMenu = document.querySelector('.mobile-menu');
-const mobileLinks = document.querySelectorAll('.mobile-menu a');
+const navHamburger = document.getElementById('nav-hamburger');
+const navMobileMenu = document.getElementById('nav-mobile-menu');
+const navMobileClose = document.getElementById('nav-mobile-close');
+const mobileLinks = document.querySelectorAll('#nav-mobile-menu a');
 
 let isMenuOpen = false;
 
-menuToggle.addEventListener('click', () => {
-    isMenuOpen = !isMenuOpen;
-    if (isMenuOpen) {
-        mobileMenu.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    } else {
-        mobileMenu.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-});
+function openMenu() {
+    isMenuOpen = true;
+    navMobileMenu.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
 
-mobileLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        isMenuOpen = false;
-        mobileMenu.classList.remove('active');
-        document.body.style.overflow = '';
-    });
-});
+function closeMenu() {
+    isMenuOpen = false;
+    navMobileMenu.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+if (navHamburger) navHamburger.addEventListener('click', openMenu);
+if (navMobileClose) navMobileClose.addEventListener('click', closeMenu);
+mobileLinks.forEach(link => link.addEventListener('click', closeMenu));
 
 // --- Hero Sequence (Scroll-Driven Frame Animation) ---
 const canvas = document.getElementById('hero-canvas');
@@ -49,7 +47,7 @@ if (canvas) {
     // Preload frames
     for (let i = 0; i < frameCount; i++) {
         const img = new Image();
-        img.src = `./Hero/frame_${String(i).padStart(3, '0')}_delay-0.033s.jpg`;
+        img.src = `/Hero/frame_${String(i).padStart(3, '0')}_delay-0.033s.jpg`;
         img.onload = () => {
             framesLoaded++;
             if (loadingBar) {
