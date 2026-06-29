@@ -175,6 +175,17 @@ if (canvas) {
         drawFrame(frameIndex);
         updateOpacities(progress);
     });
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            const progress = getScrollProgress();
+            const frameIndex = Math.min(
+                Math.floor(progress * (frameCount - 1)),
+                frameCount - 1
+            );
+            drawFrame(frameIndex);
+        }
+    });
 }
 
 if (!prefersReducedMotion) {
@@ -186,7 +197,11 @@ if (!prefersReducedMotion) {
             trigger: '#hero-sequence',
             start: '80% top',
             end: 'bottom top',
-            scrub: 1.5
+            scrub: 1.5,
+            onLeaveBack: () => {
+                gsap.set('#hero-canvas', { opacity: 1 });
+                drawFrame(0);
+            }
         }
     });
 
