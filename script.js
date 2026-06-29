@@ -56,9 +56,13 @@ const canvas = document.getElementById('hero-canvas');
 const heroOverlay = document.querySelector('.hero-dark-overlay');
 const heroTextBlock = document.querySelector('.hero-overlay');
 
+// Exposta no escopo global para o GSAP onLeaveBack acessar
+let heroDrawFrame = null;
+let heroGetProgress = null;
+
 if (canvas) {
     const ctx = canvas.getContext('2d');
-    const frameCount = 152; // Total frames found in ./Hero shoot/
+    const frameCount = 152;
     let framesLoaded = 0;
 
     canvas.width = window.innerWidth;
@@ -67,7 +71,7 @@ if (canvas) {
     const frames = [];
     const loadingBar = document.getElementById('hero-loading');
 
-    // Preload frames
+    // ── Preload frames ──
     for (let i = 0; i < frameCount; i++) {
         const img = new Image();
         img.src = `/Hero/frame_${String(i).padStart(3, '0')}_delay-0.033s.jpg`;
@@ -76,22 +80,21 @@ if (canvas) {
             if (loadingBar) {
                 loadingBar.style.width = `${(framesLoaded / frameCount) * 100}%`;
             }
-            // Draw first frame immediately when it loads
-            if (i === 0) {
-                drawFrame(0);
-            }
+            if (i === 0) drawFrame(0);
             if (framesLoaded === frameCount && loadingBar) {
                 setTimeout(() => { loadingBar.style.opacity = '0'; }, 500);
             }
         };
         frames.push(img);
     }
-    
-    // Safely draw if already complete from cache
-    if (frames[0].complete) {
-        drawFrame(0);
+
+    // Fallback: se frame 0 já estava em cache do browser
+    if (frames[0] && frames[0].complete && frames[0].naturalWidth > 0) {
+        // pequeno delay para garantir que o canvas está dimensionado
+        requestAnimationFrame(() => drawFrame(0));
     }
 
+    // ── drawImageCover ──
     function drawImageCover(ctx, img, canvasW, canvasH) {
         const imgRatio = img.width / img.height;
         const canvasRatio = canvasW / canvasH;
@@ -112,6 +115,7 @@ if (canvas) {
         ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
     }
 
+    // ── getScrollProgress ──
     function getScrollProgress() {
         const section = document.getElementById('hero-sequence');
         if (!section) return 0;
@@ -120,13 +124,28 @@ if (canvas) {
         return Math.min(Math.max(scrollTop / maxScroll, 0), 1);
     }
 
+    // ── drawFrame — exposta no escopo do bloco if(canvas) ──
     function drawFrame(index) {
         const img = frames[index];
         if (img && img.complete && img.naturalWidth > 0) {
             drawImageCover(ctx, img, canvas.width, canvas.height);
+        } else if (index > 0) {
+            // Frame ainda não carregou — tenta o mais próximo já carregado
+            for (let fallback = index - 1; fallback >= 0; fallback--) {
+                const fb = frames[fallback];
+                if (fb && fb.complete && fb.naturalWidth > 0) {
+                    drawImageCover(ctx, fb, canvas.width, canvas.height);
+                    break;
+                }
+            }
         }
     }
 
+    // ── Expor funções para o GSAP acessar fora do bloco ──
+    heroDrawFrame = drawFrame;
+    heroGetProgress = getScrollProgress;
+
+    // ── updateOpacities ──
     function updateOpacities(progress) {
         if (heroOverlay) {
             let overlayOpacity;
@@ -154,6 +173,7 @@ if (canvas) {
         }
     }
 
+    // ── Scroll listener ──
     window.addEventListener('scroll', () => {
         const progress = getScrollProgress();
         const frameIndex = Math.min(
@@ -164,6 +184,7 @@ if (canvas) {
         updateOpacities(progress);
     });
 
+    // ── Resize listener ──
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -176,9 +197,10 @@ if (canvas) {
         updateOpacities(progress);
     });
 
+    // ── Visibilitychange — redesenha ao voltar da aba ──
     document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            const progress = getScrollProgress();
+        if (!document.hidden && heroGetProgress) {
+            const progress = heroGetProgress();
             const frameIndex = Math.min(
                 Math.floor(progress * (frameCount - 1)),
                 frameCount - 1
@@ -192,15 +214,29 @@ if (!prefersReducedMotion) {
     // 1.5. Canvas Fade Out
     gsap.to('#hero-canvas', {
         opacity: 0,
-        ease: 'power2.inOut',
+        ease: 'none',          // era power2.inOut — linear evita surpresas com scrub
         scrollTrigger: {
             trigger: '#hero-sequence',
-            start: '80% top',
+            start: '85% top',  // era 80% — começa o fade um pouco mais tarde
             end: 'bottom top',
-            scrub: 1.5,
+            scrub: 0.5,        // era 1.5 — menos inércia, mais responsivo
             onLeaveBack: () => {
+                // Mata qualquer animação pendente e força opacity 1 imediatamente
+                gsap.killTweensOf('#hero-canvas');
+                gsap.set('#hero-canvas', { opacity: 1, clearProps: 'opacity' });
+                // Redesenha o frame correto pela posição atual do scroll
+                if (heroDrawFrame && heroGetProgress) {
+                    const progress = heroGetProgress();
+                    const frameIndex = Math.min(
+                        Math.floor(progress * 151),
+                        151
+                    );
+                    heroDrawFrame(frameIndex);
+                }
+            },
+            onEnter: () => {
+                // Garante que o canvas está visível ao entrar na zona de fade
                 gsap.set('#hero-canvas', { opacity: 1 });
-                drawFrame(0);
             }
         }
     });
