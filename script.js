@@ -432,17 +432,27 @@ const gradients = {
 
 function setFeaturedBg(project, catId) {
   const bg = document.getElementById('featured-bg');
+
+  const featuredPositionMap = {
+    ui:       'center center',
+    product:  'center center',
+    shooting: 'center 30%',
+    ugc:      'center 20%',
+    meta:     'center center',
+  };
+  const bgPosition = featuredPositionMap[catId] || 'center center';
+
   if (project.thumb) {
-    // Thumb estática — usa direto com gradiente de overlay
     bg.style.backgroundImage = `url(${project.thumb}), ${gradients[catId]}`;
     bg.style.backgroundSize = 'cover, cover';
-    bg.style.backgroundPosition = 'center top, center';
+    bg.style.backgroundPosition = `${bgPosition}, center`;
   } else if (project.isVercel) {
-    // Microlink para projetos Vercel sem thumb manual
     bg.style.backgroundImage = `url(${MICROLINK(project.url)}), ${gradients[catId]}`;
+    bg.style.backgroundSize = 'cover, cover';
+    bg.style.backgroundPosition = `${bgPosition}, center`;
   } else {
-    // Só gradiente
     bg.style.backgroundImage = gradients[catId];
+    bg.style.backgroundPosition = 'center';
   }
 }
 
@@ -475,7 +485,15 @@ function buildCard(project, catId) {
 
   bg.style.background = gradients[catId];
   bg.style.backgroundSize = 'cover';
-  bg.style.backgroundPosition = 'center top';
+
+  const positionMap = {
+    ui:       'center center',
+    product:  'center center',
+    shooting: 'center 30%',
+    ugc:      'center 20%',
+    meta:     'center center',
+  };
+  bg.style.backgroundPosition = positionMap[catId] || 'center center';
 
   if (project.thumb) {
     bg.style.backgroundImage = `url(${project.thumb})`;
