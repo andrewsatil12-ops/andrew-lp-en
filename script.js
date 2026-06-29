@@ -224,6 +224,24 @@ if (!prefersReducedMotion) {
     );
 }
 
+// Cases section entrance
+if (!prefersReducedMotion) {
+    gsap.fromTo('.section-eyebrow, .section-headline',
+        { y: 20, opacity: 0 },
+        {
+            y: 0, opacity: 1,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#cases',
+                start: 'top 80%',
+                toggleActions: 'play none none none'
+            }
+        }
+    );
+}
+
 // --- Netflix-style Cases Section ---
 const MICROLINK = url =>
   `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
@@ -529,9 +547,10 @@ function buildDots() {
   const container = document.getElementById('carousel-dots');
   if (!container) return;
   
-  allProjects.forEach((_, i) => {
+  allProjects.forEach((proj, i) => {
     const dot = document.createElement('div');
     dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.dataset.label = proj.name;  // tooltip com nome do projeto
     dot.addEventListener('click', () => {
       clearInterval(autoTimer);
       currentIndex = i;
