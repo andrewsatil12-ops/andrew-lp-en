@@ -337,7 +337,7 @@ const categories = [
         desc: 'Full AI editorial campaign for Chanel Le Lift. Face-lock methodology, luxury lighting, Paris setting.',
         url: 'https://www.behance.net/gallery/250635083/Chanel-Le-Lift-AI-Editorial-Campaign',
         behance: 'https://www.behance.net/gallery/250635083/Chanel-Le-Lift-AI-Editorial-Campaign',
-        thumb: null,
+        thumb: '/images/cases/chanel-editorial.jpg',
         isVercel: false,
       },
       {
@@ -346,7 +346,7 @@ const categories = [
         desc: 'Cinematic AI brand film — dark luxury streetwear editorial set in Liverpool and Manchester. NB Pro + Higgsfield.',
         url: 'https://www.behance.net/gallery/251612075/Dark-Luxury-AI-Editorial-Fashion-Streetwear',
         behance: 'https://www.behance.net/gallery/251612075/Dark-Luxury-AI-Editorial-Fashion-Streetwear',
-        thumb: null,
+        thumb: '/images/cases/dark-luxury.jpg',
         isVercel: false,
       },
       {
@@ -355,7 +355,7 @@ const categories = [
         desc: 'Fully AI-generated automotive editorial. Photoreal environments, studio-grade lighting, zero traditional photography.',
         url: 'https://www.behance.net/gallery/250549001/Full-AI-automotive-editorial',
         behance: 'https://www.behance.net/gallery/250549001/Full-AI-automotive-editorial',
-        thumb: null,
+        thumb: '/images/cases/automotive-editorial.jpg',
         isVercel: false,
       },
     ],
@@ -370,7 +370,7 @@ const categories = [
         desc: 'AI-generated UGC video for a makeup brand. Avatar creation, script, voice via ElevenLabs, video via Kling.',
         url: 'https://www.behance.net/gallery/249617565/AI-Generated-UGC-Video-Makeup-Beauty-Creator',
         behance: 'https://www.behance.net/gallery/249617565/AI-Generated-UGC-Video-Makeup-Beauty-Creator',
-        thumb: null,
+        thumb: '/images/cases/ugc-makeup.jpg',
         isVercel: false,
       },
       {
@@ -379,7 +379,7 @@ const categories = [
         desc: 'Product demo UGC video built entirely with AI tools. Face-lock avatar, scripted testimonial, Veo 3 production.',
         url: 'https://www.behance.net/gallery/249617839/AI-Generated-UGC-Video-Skincare-Product-Demo',
         behance: 'https://www.behance.net/gallery/249617839/AI-Generated-UGC-Video-Skincare-Product-Demo',
-        thumb: null,
+        thumb: '/images/cases/ugc-skincare.jpg',
         isVercel: false,
       },
       {
@@ -388,7 +388,7 @@ const categories = [
         desc: 'Full VSL (Video Sales Letter) for Fem8 DTC brand. Script, avatar, voice and final edit — AI-native production pipeline.',
         url: 'https://www.behance.net/gallery/251730769/Fem8-(VSL-DTC)',
         behance: 'https://www.behance.net/gallery/251730769/Fem8-(VSL-DTC)',
-        thumb: null,
+        thumb: '/images/cases/fem8-vsl.jpg',
         isVercel: false,
       },
     ],
@@ -403,7 +403,7 @@ const categories = [
         desc: 'Curated selection of static and animated ad creatives for paid traffic. Meta and Google campaigns.',
         url: 'https://www.behance.net/gallery/245038457/Selected-Works-Branding-Design-Social-Media',
         behance: 'https://www.behance.net/gallery/245038457/Selected-Works-Branding-Design-Social-Media',
-        thumb: null,
+        thumb: '/images/cases/selected-works-branding.jpg',
         isVercel: false,
       },
       {
@@ -412,7 +412,7 @@ const categories = [
         desc: 'Motion graphics and video ads for brand identity and performance campaigns across Meta and TikTok.',
         url: 'https://www.behance.net/gallery/245056949/Selected-Works-Brand-Identity-Video',
         behance: 'https://www.behance.net/gallery/245056949/Selected-Works-Brand-Identity-Video',
-        thumb: null,
+        thumb: '/images/cases/selected-works-video.jpg',
         isVercel: false,
       },
     ],
@@ -432,9 +432,16 @@ const gradients = {
 
 function setFeaturedBg(project, catId) {
   const bg = document.getElementById('featured-bg');
-  if (project.isVercel) {
+  if (project.thumb) {
+    // Thumb estática — usa direto com gradiente de overlay
+    bg.style.backgroundImage = `url(${project.thumb}), ${gradients[catId]}`;
+    bg.style.backgroundSize = 'cover, cover';
+    bg.style.backgroundPosition = 'center top, center';
+  } else if (project.isVercel) {
+    // Microlink para projetos Vercel sem thumb manual
     bg.style.backgroundImage = `url(${MICROLINK(project.url)}), ${gradients[catId]}`;
   } else {
+    // Só gradiente
     bg.style.backgroundImage = gradients[catId];
   }
 }
@@ -470,14 +477,16 @@ function buildCard(project, catId) {
   bg.style.backgroundSize = 'cover';
   bg.style.backgroundPosition = 'center top';
 
-  if (project.isVercel) {
+  if (project.thumb) {
+    bg.style.backgroundImage = `url(${project.thumb})`;
+  } else if (project.isVercel) {
     const thumbUrl = MICROLINK(project.url);
     const img = new Image();
     img.onload = () => {
       bg.style.backgroundImage = `url(${thumbUrl})`;
     };
     img.onerror = () => {
-      console.warn('Thumb failed for:', project.url);
+      console.warn('Microlink thumb failed for:', project.url);
     };
     setTimeout(() => { img.src = ''; }, 5000);
     img.src = thumbUrl;
@@ -496,8 +505,6 @@ function buildCard(project, catId) {
   a.appendChild(bg);
   a.appendChild(overlay);
   a.appendChild(content);
-
-  // Removed mouseenter listener for auto-rotate logic
 
   return a;
 }
