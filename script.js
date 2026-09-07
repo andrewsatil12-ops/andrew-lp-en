@@ -1,344 +1,138 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio | Editorial Luxury</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <!-- Fonts: Bodoni Moda for couture editorial serif, Jost for clean wide sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Quintessential&display=swap" rel="stylesheet">
-</head>
-<body>
+document.addEventListener('DOMContentLoaded', () => {
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const views = document.querySelectorAll('.view');
+    const gridItems = document.querySelectorAll('.grid-item');
+    const backToTopBtn = document.getElementById('back-to-top');
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const mainNav = document.querySelector('.main-nav');
 
-    <!-- Ambient Background Light Flares -->
-    <div class="bg-flare flare-gold"></div>
-    <div class="bg-flare flare-bordeaux"></div>
+    // Mobile Menu Toggle Logic
+    if (mobileMenuToggle && mainNav) {
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenuToggle.classList.toggle('active');
+            mainNav.classList.toggle('mobile-active');
+        });
+    }
 
-    <header id="main-header">
-        <div class="logo">
-            <a href="#" class="logo-link" style="display: flex; align-items: center; gap: 1rem; text-decoration: none;">
-                <img src="assets/logo_stl.png" alt="Andrew Satil Logo" style="height: 2.5rem; width: auto;">
-                <span class="logo-text" style="font-family: 'Quintessential', cursive; font-style: normal; line-height: 1;">Andrew Satil</span>
-            </a>
-        </div>
-        <button class="mobile-menu-toggle" aria-label="Toggle Navigation Menu">
-            <span class="hamburger-bar"></span>
-            <span class="hamburger-bar"></span>
-            <span class="hamburger-bar"></span>
-        </button>
-        <nav class="main-nav">
-            <ul class="nav-links">
-                <li><button class="nav-btn active" data-target="home" data-filter="all">HOME</button></li>
-                <li><button class="nav-btn" data-target="home" data-filter="web">LANDING PAGES & WEB</button></li>
-                <li><button class="nav-btn" data-target="home" data-filter="performance">PERFORMANCE CREATIVE</button></li>
-                <li><button class="nav-btn" data-target="home" data-filter="ai">AI PRODUCTION</button></li>
-                <li><button class="nav-btn" data-target="about">ABOUT</button></li>
-            </ul>
-        </nav>
-    </header>
+    // Navigation and Filtering Logic
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // 1. Update Active State on Buttons
+            navButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-    <main id="main-content">
-        <!-- HOME / WORK VIEW -->
-        <section id="view-home" class="view active-view">
-            <div class="work-grid">
-                <!-- Symmetrical, editorial grid with gaps -->
+            // Close mobile menu on nav click
+            if (mobileMenuToggle && mainNav) {
+                mobileMenuToggle.classList.remove('active');
+                mainNav.classList.remove('mobile-active');
+            }
+
+            // 2. View Switching
+            const targetViewId = btn.getAttribute('data-target');
+            views.forEach(view => {
+                if (view.id === `view-${targetViewId}`) {
+                    view.classList.add('active-view');
+                } else {
+                    view.classList.remove('active-view');
+                }
+            });
+
+            // 3. Grid Filtering (if target is home)
+            if (targetViewId === 'home') {
+                const filterValue = btn.getAttribute('data-filter');
                 
-                <!-- FEATURED (HOME) CARDS IN EXACT ORDER -->
-                <!-- ROW 1, ITEM 1: Meta Ads & Social Media Design -->
-                <a href="https://www.behance.net/gallery/245038457/Meta-ads-Social-Media-Design" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="performance" data-featured="true" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/montante.png" class="slideshow-img active" alt="Meta Ads 1" style="object-position: center center;">
-                        <img src="assets/images/excel1.png" class="slideshow-img" alt="Meta Ads 2" loading="lazy" style="object-position: center top;">
-                        <img src="assets/images/excel2.png" class="slideshow-img" alt="Meta Ads 3" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/excel3.png" class="slideshow-img" alt="Meta Ads 4" loading="lazy" style="object-position: center top;">
-                        <img src="assets/images/cafedeuspai.png" class="slideshow-img" alt="Meta Ads 5" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/apex1.png" class="slideshow-img" alt="Meta Ads 6" loading="lazy" style="object-position: center top;">
-                        <img src="assets/images/apex2.png" class="slideshow-img" alt="Meta Ads 7" loading="lazy" style="object-position: center top;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Meta Ads & Social Media Design</h3>
-                        <p class="project-category">Performance Creative</p>
-                    </div>
-                </a>
+                gridItems.forEach(item => {
+                    if (filterValue === 'all') {
+                        // On Home view, only show items with data-featured="true"
+                        if (item.getAttribute('data-featured') === 'true') {
+                            item.classList.remove('hide');
+                        } else {
+                            item.classList.add('hide');
+                        }
+                    } else {
+                        const itemCategory = item.getAttribute('data-category');
+                        if (itemCategory === filterValue) {
+                            item.classList.remove('hide');
+                        } else {
+                            item.classList.add('hide');
+                        }
+                    }
+                });
 
-                <!-- PERFORMANCE CREATIVE COPY BLOCK (Fills gap in Performance tab) -->
-                <div class="grid-item performance-copy-card" data-category="performance">
-                    <h3 class="copy-heading">Creative that's judged by numbers, not opinions.</h3>
-                    <p class="copy-text">I design performance creative for <strong>Meta Ads Manager</strong> and <strong>Google Ads</strong>, tested against real <strong>CTR, CPC, and CPA targets</strong>, not internal taste.</p>
-                    <p class="copy-text">As the <strong>sole designer inside an 18-account squad</strong> at one of Latin America's largest marketing agencies, I translated live campaign metrics from <strong>GA4</strong> into creative iterations fast enough to keep pace with aggressive CPA targets across B2B and B2C accounts. One real estate lead-gen campaign I designed directly contributed to a <strong>R$700,000 property sale</strong>.</p>
-                    <p class="copy-text">I currently lead creative strategy for paid media across real estate, labor law, and hospitality clients, driving down average CPA through <strong>iterative, data-backed A/B testing</strong>, and writing the direct-response ad copy and video scripts alongside the visuals.</p>
-                    <p class="copy-text">See the full body of work on Behance: <strong>static ads, carousels, and video creative built to convert</strong>, not just to look good.</p>
-                    
-                    <div class="performance-cta-wrapper">
-                        <a href="https://www.behance.net/drewsatil" target="_blank" rel="noopener noreferrer" class="btn btn-behance">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: middle;"><path d="M7.4 6.5C8.8 6.5 9.9 6.8 10.6 7.5C11.3 8.2 11.7 9.1 11.7 10.2C11.7 11.2 11.4 12 10.8 12.6C10.2 13.2 9.3 13.6 8.2 13.8V13.9C9.6 14.1 10.7 14.6 11.3 15.3C12 16 12.4 17 12.4 18.2C12.4 19.5 11.9 20.6 11 21.4C10.1 22.2 8.7 22.6 6.9 22.6H0V6.5H7.4ZM4.1 9.4V12.1H6.7C7.4 12.1 8 11.9 8.4 11.6C8.8 11.3 9 10.8 9 10.2C9 9.6 8.8 9.2 8.4 8.9C8 8.6 7.4 8.5 6.6 8.5H4.1V9.4ZM4.1 15V19.7H7.1C7.9 19.7 8.6 19.5 9.1 19.1C9.6 18.7 9.8 18.1 9.8 17.3C9.8 16.5 9.5 15.9 9 15.5C8.5 15.1 7.7 14.9 6.8 14.9H4.1V15ZM14.9 8.2H20.7V9.7H14.9V8.2ZM21 16.4H15.1C15.2 17.3 15.5 18 16.1 18.4C16.7 18.8 17.4 19 18.3 19C19.1 19 19.8 18.8 20.3 18.4L21.3 19.5C20.5 20.2 19.4 20.6 18.1 20.6C16.4 20.6 15.1 20 14.2 18.9C13.3 17.8 12.9 16.3 12.9 14.4C12.9 12.6 13.3 11.1 14.2 10C15.1 8.9 16.4 8.3 18.1 8.3C19.6 8.3 20.8 8.9 21.6 9.9C22.4 10.9 22.8 12.3 22.8 14.1V15.2H21V16.4ZM15.1 14H19.7C19.7 13.1 19.4 12.4 18.9 11.9C18.4 11.4 17.7 11.1 16.9 11.1C16.1 11.1 15.5 11.4 15 11.9C14.5 12.4 14.3 13.1 14.3 14H15.1Z"/></svg>
-                            <span>View full portfolio on Behance</span>
-                        </a>
-                    </div>
-                </div>
+                // 4. Tab CTA Filtering
+                const tabCtas = document.querySelectorAll('.tab-cta');
+                tabCtas.forEach(cta => {
+                    const targetFilter = cta.getAttribute('data-filter-target');
+                    if (targetFilter === filterValue) {
+                        cta.classList.remove('hide');
+                    } else {
+                        cta.classList.add('hide');
+                    }
+                });
+            }
+            
+            // Scroll to top when changing views
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
 
-                <!-- ROW 1, ITEM 2: Naturéa Botanicals -->
-                <a href="https://naturea-botanics.vercel.app/" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="web" data-featured="true" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/hero-bottle-stone.jpg" class="slideshow-img active" alt="Naturéa Botanicals 1" style="object-position: center center;">
-                        <img src="assets/images/products-flatlay.jpg" class="slideshow-img" alt="Naturéa Botanicals 2" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/services-aromatherapy.jpg" class="slideshow-img" alt="Naturéa Botanicals 3" loading="lazy" style="object-position: 65% center;">
-                        <img src="assets/images/gallery-rituals.jpg" class="slideshow-img" alt="Naturéa Botanicals 4" loading="lazy" style="object-position: 75% center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Naturéa Botanicals</h3>
-                        <p class="project-category">Landing Page & Web</p>
-                    </div>
-                </a>
+    // Back to Top Button
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 
-                <!-- ROW 2, ITEM 1: Chanel Le Lift - AI Editorial Campaign -->
-                <a href="https://www.behance.net/gallery/250635083/Chanel-Le-Lift-AI-Editorial-Campaign" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="ai" data-featured="true" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/chanel-hero-product.jpg" class="slideshow-img active" alt="Chanel Le Lift 1" style="object-position: center center;">
-                        <img src="assets/images/chanel-editorial-model.jpg" class="slideshow-img" alt="Chanel Le Lift 2" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/chanel-editorial-lightbar.jpg" class="slideshow-img" alt="Chanel Le Lift 3" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/chanel-editorial-stone.jpg" class="slideshow-img" alt="Chanel Le Lift 4" loading="lazy" style="object-position: center center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Chanel Le Lift - AI Editorial Campaign</h3>
-                        <p class="project-category">AI Production</p>
-                    </div>
-                </a>
-                
-                <!-- ROW 2, ITEM 2: The Hudson Penthouse -->
-                <a href="https://penthouse-eight.vercel.app/" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="web" data-featured="true" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/hero-day.jpg" class="slideshow-img active" alt="Penthouse 1" style="object-position: center center;">
-                        <img src="assets/images/terrace.jpg" class="slideshow-img" alt="Penthouse 2" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/kitchen.jpg" class="slideshow-img" alt="Penthouse 3" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/dining-room.jpg" class="slideshow-img" alt="Penthouse 4" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/master-bedroom.jpg" class="slideshow-img" alt="Penthouse 5" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/bathroom-tub.jpg" class="slideshow-img" alt="Penthouse 6" loading="lazy" style="object-position: center center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">The Hudson Penthouse</h3>
-                        <p class="project-category">Landing Page & Web</p>
-                    </div>
-                </a>
+    // Initialize filter state on page load
+    const initialActiveBtn = document.querySelector('.nav-btn.active');
+    if (initialActiveBtn) {
+        initialActiveBtn.click();
+    }
 
-                <!-- ROW 3, ITEM 1: Noir & Ground -->
-                <a href="https://noir-and-ground.vercel.app/" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="web" data-featured="true" style="text-decoration: none;">
-                    <div class="grid-img" style="background-image: url('https://noir-and-ground.vercel.app/images/slider_3.jpg');"></div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Noir & Ground</h3>
-                        <p class="project-category">Landing Page & Web</p>
-                    </div>
-                </a>
+    // Auto-Crossfade Slideshow Logic (Viewport-Aware via IntersectionObserver)
+    const slideshowContainers = document.querySelectorAll('.slideshow-container');
+    
+    slideshowContainers.forEach(container => {
+        const slides = container.querySelectorAll('.slideshow-img');
+        if (slides.length <= 1) return;
+        
+        let currentIndex = 0;
+        let intervalId = null;
 
-                <!-- ROW 3, ITEM 2: Fem8 (VSL DTC) -->
-                <a href="https://www.behance.net/gallery/251730769/Fem8-(VSL-DTC)" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="ai" data-featured="true" style="text-decoration: none;">
-                    <div class="grid-img" style="background-image: url('assets/images/fem8-vsl-hero.jpg'); background-position: center top;"></div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Fem8 (VSL DTC)</h3>
-                        <p class="project-category">AI Production</p>
-                    </div>
-                </a>
+        const startSlideshow = () => {
+            if (intervalId) return;
+            intervalId = setInterval(() => {
+                slides[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % slides.length;
+                slides[currentIndex].classList.add('active');
+            }, 2000); // 2000ms = 2s interval
+        };
 
-                <!-- NON-FEATURED CARDS -->
-                <!-- 4. GERA Botanicals -->
-                <a href="https://gera-botanicals.vercel.app/" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="web" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/gera-hero.jpg" class="slideshow-img active" alt="GERA Botanicals 1" style="object-position: 70% center;">
-                        <img src="assets/images/gera-jar.jpg" class="slideshow-img" alt="GERA Botanicals 2" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/gera-packaging.jpg" class="slideshow-img" alt="GERA Botanicals 3" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/gera-bottles.jpg" class="slideshow-img" alt="GERA Botanicals 4" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/gera-lifestyle.jpg" class="slideshow-img" alt="GERA Botanicals 5" loading="lazy" style="object-position: center center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">GERA Botanicals</h3>
-                        <p class="project-category">Landing Page & Web</p>
-                    </div>
-                </a>
+        const stopSlideshow = () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        };
 
-                <a href="https://sakura-void.vercel.app/" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="web" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/sakura1.png" class="slideshow-img active" alt="Sakura Void 1" style="object-position: center center;">
-                        <img src="assets/images/sakura2.png" class="slideshow-img" alt="Sakura Void 2" loading="lazy" style="object-position: center center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Sakura Void</h3>
-                        <p class="project-category">Landing Page & Web</p>
-                    </div>
-                </a>
-
-                <a href="https://clinica-estetica-wine.vercel.app/" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="web" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/hero-mobile-1x1.jpg" class="slideshow-img active" alt="Clínica Estética 1" style="object-position: center top;">
-                        <img src="assets/images/before-after-olheiras.jpg" class="slideshow-img" alt="Clínica Estética 2" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/service-depilacao-laser.jpg" class="slideshow-img" alt="Clínica Estética 3" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/service-harmonizacao-facial.jpg" class="slideshow-img" alt="Clínica Estética 4" loading="lazy" style="object-position: center center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Clínica Estética</h3>
-                        <p class="project-category">Landing Page & Web</p>
-                    </div>
-                </a>
-
-                <a href="https://25h-case-study.vercel.app/" target="_blank" rel="noopener noreferrer" class="grid-item feature" data-category="web" style="text-decoration: none;">
-                    <div class="grid-img" style="background-image: url('assets/images/25h-lineup-hero.jpg'); background-position: center center;"></div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">25h — Brandbook as a Landing Page</h3>
-                        <p class="project-category">Landing Page & Web</p>
-                    </div>
-                </a>
-
-                <!-- AI Production Grid (Non-Featured) -->
-
-                <a href="https://www.behance.net/gallery/248903153/Photoshoot-Espuma-MIZZ-beauty-brand" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="ai" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/mizz2.png" class="slideshow-img active" alt="MIZZ Beauty Brand 1" style="object-position: center center;">
-                        <img src="assets/images/mizz1.png" class="slideshow-img" alt="MIZZ Beauty Brand 2" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/mizz3.png" class="slideshow-img" alt="MIZZ Beauty Brand 3" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/mizz4.png" class="slideshow-img" alt="MIZZ Beauty Brand 4" loading="lazy" style="object-position: center center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Photoshoot Espuma - MIZZ Beauty Brand</h3>
-                        <p class="project-category">AI Production</p>
-                    </div>
-                </a>
-
-                <a href="https://www.behance.net/gallery/251612075/Dark-Luxury-AI-Editorial-Fashion-Streetwear" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="ai" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/luxury3.png" class="slideshow-img active" alt="Dark Luxury 1" style="object-position: 60% center;">
-                        <img src="assets/images/luxury1.png" class="slideshow-img" alt="Dark Luxury 2" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/luxury2.png" class="slideshow-img" alt="Dark Luxury 3" loading="lazy" style="object-position: center center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Dark Luxury - AI Editorial Fashion/Streetwear</h3>
-                        <p class="project-category">AI Production</p>
-                    </div>
-                </a>
-
-                <a href="https://www.behance.net/gallery/249617565/AI-Generated-UGC-Video-Makeup-Beauty-Creator" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="ai" style="text-decoration: none;">
-                    <div class="grid-img" style="background-image: url('assets/images/makeup-ugc-hero.jpg'); background-position: center top;"></div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">AI-Generated UGC - Makeup Beauty Creator</h3>
-                        <p class="project-category">AI Production</p>
-                    </div>
-                </a>
-
-                <a href="https://www.behance.net/gallery/250549001/Full-AI-automotive-editorial" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="ai" style="text-decoration: none;">
-                    <div class="grid-img slideshow-container">
-                        <img src="assets/images/carro4.png" class="slideshow-img active" alt="Full AI Automotive Editorial 1" style="object-position: center center;">
-                        <img src="assets/images/carro1.png" class="slideshow-img" alt="Full AI Automotive Editorial 2" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/carro2.png" class="slideshow-img" alt="Full AI Automotive Editorial 3" loading="lazy" style="object-position: center center;">
-                        <img src="assets/images/carro3.png" class="slideshow-img" alt="Full AI Automotive Editorial 4" loading="lazy" style="object-position: 35% center;">
-                    </div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">Full AI Automotive Editorial</h3>
-                        <p class="project-category">AI Production</p>
-                    </div>
-                </a>
-
-                <a href="https://www.behance.net/gallery/249617839/AI-Generated-UGC-Video-Skincare-Product-Demo" target="_blank" rel="noopener noreferrer" class="grid-item portrait" data-category="ai" style="text-decoration: none;">
-                    <div class="grid-img" style="background-image: url('assets/images/skincare-ugc-hero.jpg'); background-position: center top;"></div>
-                    <div class="grid-overlay">
-                        <div class="frame"></div>
-                        <h3 class="project-title">AI-Generated UGC - Skincare Product Demo</h3>
-                        <p class="project-category">AI Production</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- SECTION-ENDING BEHANCE CTA BUTTONS FOR EACH TAB -->
-            <div class="tab-cta-container">
-                <!-- HOME tab CTA -->
-                <a href="https://behance.net/drewsatil" target="_blank" rel="noopener noreferrer" class="btn btn-behance tab-cta" data-filter-target="all">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: middle;"><path d="M7.4 6.5C8.8 6.5 9.9 6.8 10.6 7.5C11.3 8.2 11.7 9.1 11.7 10.2C11.7 11.2 11.4 12 10.8 12.6C10.2 13.2 9.3 13.6 8.2 13.8V13.9C9.6 14.1 10.7 14.6 11.3 15.3C12 16 12.4 17 12.4 18.2C12.4 19.5 11.9 20.6 11 21.4C10.1 22.2 8.7 22.6 6.9 22.6H0V6.5H7.4ZM4.1 9.4V12.1H6.7C7.4 12.1 8 11.9 8.4 11.6C8.8 11.3 9 10.8 9 10.2C9 9.6 8.8 9.2 8.4 8.9C8 8.6 7.4 8.5 6.6 8.5H4.1V9.4ZM4.1 15V19.7H7.1C7.9 19.7 8.6 19.5 9.1 19.1C9.6 18.7 9.8 18.1 9.8 17.3C9.8 16.5 9.5 15.9 9 15.5C8.5 15.1 7.7 14.9 6.8 14.9H4.1V15ZM14.9 8.2H20.7V9.7H14.9V8.2ZM21 16.4H15.1C15.2 17.3 15.5 18 16.1 18.4C16.7 18.8 17.4 19 18.3 19C19.1 19 19.8 18.8 20.3 18.4L21.3 19.5C20.5 20.2 19.4 20.6 18.1 20.6C16.4 20.6 15.1 20 14.2 18.9C13.3 17.8 12.9 16.3 12.9 14.4C12.9 12.6 13.3 11.1 14.2 10C15.1 8.9 16.4 8.3 18.1 8.3C19.6 8.3 20.8 8.9 21.6 9.9C22.4 10.9 22.8 12.3 22.8 14.1V15.2H21V16.4ZM15.1 14H19.7C19.7 13.1 19.4 12.4 18.9 11.9C18.4 11.4 17.7 11.1 16.9 11.1C16.1 11.1 15.5 11.4 15 11.9C14.5 12.4 14.3 13.1 14.3 14H15.1Z"/></svg>
-                    <span>View full portfolio on Behance</span>
-                </a>
-
-                <!-- LANDING PAGES & WEB tab CTA -->
-                <a href="https://behance.net/drewsatil" target="_blank" rel="noopener noreferrer" class="btn btn-behance tab-cta hide" data-filter-target="web">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: middle;"><path d="M7.4 6.5C8.8 6.5 9.9 6.8 10.6 7.5C11.3 8.2 11.7 9.1 11.7 10.2C11.7 11.2 11.4 12 10.8 12.6C10.2 13.2 9.3 13.6 8.2 13.8V13.9C9.6 14.1 10.7 14.6 11.3 15.3C12 16 12.4 17 12.4 18.2C12.4 19.5 11.9 20.6 11 21.4C10.1 22.2 8.7 22.6 6.9 22.6H0V6.5H7.4ZM4.1 9.4V12.1H6.7C7.4 12.1 8 11.9 8.4 11.6C8.8 11.3 9 10.8 9 10.2C9 9.6 8.8 9.2 8.4 8.9C8 8.6 7.4 8.5 6.6 8.5H4.1V9.4ZM4.1 15V19.7H7.1C7.9 19.7 8.6 19.5 9.1 19.1C9.6 18.7 9.8 18.1 9.8 17.3C9.8 16.5 9.5 15.9 9 15.5C8.5 15.1 7.7 14.9 6.8 14.9H4.1V15ZM14.9 8.2H20.7V9.7H14.9V8.2ZM21 16.4H15.1C15.2 17.3 15.5 18 16.1 18.4C16.7 18.8 17.4 19 18.3 19C19.1 19 19.8 18.8 20.3 18.4L21.3 19.5C20.5 20.2 19.4 20.6 18.1 20.6C16.4 20.6 15.1 20 14.2 18.9C13.3 17.8 12.9 16.3 12.9 14.4C12.9 12.6 13.3 11.1 14.2 10C15.1 8.9 16.4 8.3 18.1 8.3C19.6 8.3 20.8 8.9 21.6 9.9C22.4 10.9 22.8 12.3 22.8 14.1V15.2H21V16.4ZM15.1 14H19.7C19.7 13.1 19.4 12.4 18.9 11.9C18.4 11.4 17.7 11.1 16.9 11.1C16.1 11.1 15.5 11.4 15 11.9C14.5 12.4 14.3 13.1 14.3 14H15.1Z"/></svg>
-                    <span>View more on Behance</span>
-                </a>
-
-                <!-- AI PRODUCTION tab CTA -->
-                <a href="https://behance.net/drewsatil" target="_blank" rel="noopener noreferrer" class="btn btn-behance tab-cta hide" data-filter-target="ai">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; vertical-align: middle;"><path d="M7.4 6.5C8.8 6.5 9.9 6.8 10.6 7.5C11.3 8.2 11.7 9.1 11.7 10.2C11.7 11.2 11.4 12 10.8 12.6C10.2 13.2 9.3 13.6 8.2 13.8V13.9C9.6 14.1 10.7 14.6 11.3 15.3C12 16 12.4 17 12.4 18.2C12.4 19.5 11.9 20.6 11 21.4C10.1 22.2 8.7 22.6 6.9 22.6H0V6.5H7.4ZM4.1 9.4V12.1H6.7C7.4 12.1 8 11.9 8.4 11.6C8.8 11.3 9 10.8 9 10.2C9 9.6 8.8 9.2 8.4 8.9C8 8.6 7.4 8.5 6.6 8.5H4.1V9.4ZM4.1 15V19.7H7.1C7.9 19.7 8.6 19.5 9.1 19.1C9.6 18.7 9.8 18.1 9.8 17.3C9.8 16.5 9.5 15.9 9 15.5C8.5 15.1 7.7 14.9 6.8 14.9H4.1V15ZM14.9 8.2H20.7V9.7H14.9V8.2ZM21 16.4H15.1C15.2 17.3 15.5 18 16.1 18.4C16.7 18.8 17.4 19 18.3 19C19.1 19 19.8 18.8 20.3 18.4L21.3 19.5C20.5 20.2 19.4 20.6 18.1 20.6C16.4 20.6 15.1 20 14.2 18.9C13.3 17.8 12.9 16.3 12.9 14.4C12.9 12.6 13.3 11.1 14.2 10C15.1 8.9 16.4 8.3 18.1 8.3C19.6 8.3 20.8 8.9 21.6 9.9C22.4 10.9 22.8 12.3 22.8 14.1V15.2H21V16.4ZM15.1 14H19.7C19.7 13.1 19.4 12.4 18.9 11.9C18.4 11.4 17.7 11.1 16.9 11.1C16.1 11.1 15.5 11.4 15 11.9C14.5 12.4 14.3 13.1 14.3 14H15.1Z"/></svg>
-                    <span>View more on Behance</span>
-                </a>
-            </div>
-        </section>
-
-        <!-- ABOUT VIEW -->
-        <section id="view-about" class="view">
-            <div class="about-flare"></div>
-            <div class="about-container">
-                <!-- Left Column: Headshot Photo -->
-                <div class="about-photo-wrapper">
-                    <img src="assets/images/andrew-about-headshot.png" alt="Andrew Satil" class="about-photo" loading="lazy">
-                </div>
-
-                <div class="about-bio">
-                    <p>I'm <strong>Andrew Satil</strong>, a <strong>Marketing Designer & Creative Strategist</strong> based in Brazil, working remotely with <strong>DTC, e-commerce, and premium consumer brands</strong>.</p>
-                    <p>For <strong>5+ years</strong> I've worked at the intersection of brand identity and performance marketing — designing <strong>conversion-optimized landing pages</strong>, producing <strong>direct-response creative</strong>, and running <strong>A/B tests</strong> against real CPA and ROAS targets.</p>
-                    <p>As <strong>sole designer inside a 18-account squad</strong> at one of Latin America's largest marketing agencies, I shipped fast without losing craft. As <strong>Creative Lead</strong> for a scaling dermocosmetics e-commerce brand, I <strong>cut photography costs by 60–70%</strong> by integrating AI-generation into the production pipeline — without sacrificing premium finish.</p>
-                    <p>What I bring: <strong>Figma-level UI/UX</strong>, working fluency in <strong>Meta Ads Manager, GA4, and CRO</strong>, plus an <strong>AI-assisted workflow</strong> that compresses production time without cutting corners on the thinking.</p>
-                    
-                    <div class="cv-buttons">
-                        <a href="assets/Andrew_Satil_Resume.pdf" target="_blank" rel="noopener noreferrer" class="btn btn-cv">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; vertical-align: middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            <span>View CV</span>
-                        </a>
-                        <a href="https://www.linkedin.com/in/andrewsatil" target="_blank" rel="noopener noreferrer" class="btn btn-linkedin">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px; vertical-align: middle;"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.25V10.9H6.46M7.86 6.78a1.62 1.62 0 1 0 0 3.24 1.62 1.62 0 0 0 0-3.24z"/></svg>
-                            <span>LinkedIn</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CONTACT VIEW -->
-        <section id="view-contact" class="view">
-            <div class="contact-container glass-panel">
-                <h2 class="contact-title">Let's Connect</h2>
-                <div class="contact-details">
-                    <a href="mailto:hello@placeholder.com" class="contact-link">hello@placeholder.com</a>
-                    <a href="tel:+1234567890" class="contact-link">+1 234 567 890</a>
-                </div>
-                <div class="social-icons">
-                    <a href="#" class="social-icon">Be</a>
-                    <a href="#" class="social-icon">In</a>
-                    <a href="#" class="social-icon">Ig</a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer id="main-footer">
-        <button id="back-to-top">↑ Back to Top</button>
-    </footer>
-
-    <script src="script.js"></script>
-</body>
-</html>
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        startSlideshow();
+                    } else {
+                        stopSlideshow();
+                    }
+                });
+            }, { threshold: 0.1 });
+            observer.observe(container);
+        } else {
+            startSlideshow();
+        }
+    });
+});
