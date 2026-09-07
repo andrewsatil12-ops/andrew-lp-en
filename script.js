@@ -60,6 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 });
+
+                // 4. Tab CTA Filtering
+                const tabCtas = document.querySelectorAll('.tab-cta');
+                tabCtas.forEach(cta => {
+                    const targetFilter = cta.getAttribute('data-filter-target');
+                    if (targetFilter === filterValue) {
+                        cta.classList.remove('hide');
+                    } else {
+                        cta.classList.add('hide');
+                    }
+                });
             }
             
             // Scroll to top when changing views
